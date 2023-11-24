@@ -11,7 +11,7 @@ This package provides a Python interface to the program `Graphab <https://source
 =============
 Prerequisites
 =============
-In order to install and use Graphab4py, `Python <https://www.python.org>`_ >= 3.9 and `Java <https://www.java.com>`_ >= 8 are both required. It is also recommended to have `pip <https://pip.pypa.io/en/stable/installation/>`_ available to install the latest version of Graphab4py.
+In order to install and use Graphab4py, `Python <https://www.python.org>`_ >= 3.9 and `Java <https://www.java.com>`_ >= 8 are both required. It is also recommended to have `pip <https://pip.pypa.io/en/stable/installation/>`_ available to install the latest version of Graphab4py. Graphab is not required but can be installed through Graphab4py. Alternatively, an existing Graphab Java executable can be set up for use in Graphab4py.
 
 ============
 Installation
