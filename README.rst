@@ -10,6 +10,7 @@ Graphab4Py is available on `PyPI <https://pypi.org/project/graphab4py>`_. To ins
 
 .. code-block:: shell
    pip install graphab4py
+   
 
 =======
 Example
