@@ -1,0 +1,1 @@
+This package is supposed to provide a Python interface to the program Graphab (https://sourcesup.renater.fr/www/graphab/en/home.html). The author(s) of this Python package are not developing Graphab.

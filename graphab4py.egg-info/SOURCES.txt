@@ -1,0 +1,8 @@
+LICENSE
+README.rst
+pyproject.toml
+setup.py
+graphab4py.egg-info/PKG-INFO
+graphab4py.egg-info/SOURCES.txt
+graphab4py.egg-info/dependency_links.txt
+graphab4py.egg-info/top_level.txt
