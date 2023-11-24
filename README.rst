@@ -18,9 +18,11 @@ Example
    from graphab4py import project
    project.set_graphab("/home/rca/opt/")
    prj = project.Project()
+   
    prj.create_project(
        name = "MyProject", patches = "/home/rca/dat/pat/Patches.tif", habitat = 1, directory = "/home/rca/prj"
        )
+   
    prj.create_linkset(
        disttype = "cost",
        linkname = "L1",
@@ -28,6 +30,8 @@ Example
        cost_raster = "/home/rca/dat/res/resistance_surface.tif"
        )
 
+   prj.create_graph(graphname = "G1")
+   
 ===
 End
 ===
