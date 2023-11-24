@@ -1,3 +1,8 @@
+.. image:: /docs/img/Ga4Py.png
+   :width: 600
+   :alt: Graphab4py Logo
+   
+
 =====
 About
 =====
