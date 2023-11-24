@@ -1,0 +1,31 @@
+Metadata-Version: 2.1
+Name: graphab4py
+Version: 1.0.1b0
+Summary: A Python package to execute Graphab analyses.
+Home-page: https://github.com/ManuelPopp/graphab4py
+Author: Manuel R. Popp
+Author-email: "Manuel R. Popp" <requests@cdpopp.de>
+Project-URL: Homepage, https://github.com/manuelpopp/graphab4py
+Project-URL: Issues, https://github.com/manuelpopp/graphab4py/issues
+Keywords: Graphab,Network analysis
+Classifier: Programming Language :: Python :: 3
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: The Unlicense (Unlicense)
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+
+=====
+About
+=====
+This package provides a Python interface to the program `Graphab <https://sourcesup.renater.fr/www/graphab/en/home.html/>`_. The author(s) of this Python package are not developing Graphab.
+
+============
+Installation
+============
+Graphab4Py is available on `PyPI <https://pypi.org/project/graphab4py>`_. To install Graphab4Py, run the following line:
+
+``pip install graphab4py``

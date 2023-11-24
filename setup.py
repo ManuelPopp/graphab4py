@@ -19,7 +19,7 @@ dir_main = os.path.abspath(os.path.dirname(__file__))
 
 setup(
       name = "graphab4py",
-      version = "1.0.2",
+      version = "1.0.1b",
       author = "Manuel R. Popp",
       author_email = "requests@cdpopp.de",
       description = "A Python interface to Graphab.",
@@ -27,7 +27,8 @@ setup(
       install_requires = [
           "numpy", "matplotlib"
           ],
-      packages = find_packages(),
+      package_dir = {"": "src"},
+      packages = find_packages("./src"),
       classifiers = [
           "Programming Language :: Python :: 3",
           "License :: OSI Approved :: Unlicense",
