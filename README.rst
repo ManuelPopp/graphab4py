@@ -1,12 +1,17 @@
 =====
 About
 =====
-This package provides a Python interface to the program `Graphab <https://sourcesup.renater.fr/www/graphab/en/home.html/>`_. The author(s) of this Python package are not developing Graphab.
+This package provides a Python interface to the program `Graphab <https://sourcesup.renater.fr/www/graphab/en/home.html/>`_. The author(s) of this Python package are not developing Graphab. Rather, Graphab is an independent software which provides a graphical user interface, as well as a command line interface. Further information on Graphab can be found `here <https://sourcesup.renater.fr/www/graphab/en/home.html>`_.
+
+=============
+Prerequisites
+=============
+In order to install and use Graphab4py, `Python <https://www.python.org>`_ >= 3.9 and `Java <https://www.java.com>`_ >= 8 are both required. It is also recommended to have `pip <https://pip.pypa.io/en/stable/installation/>`_ available to install the latest version of Graphab4py.
 
 ============
 Installation
 ============
-Graphab4Py is available on `PyPI <https://pypi.org/project/graphab4py>`_. To install Graphab4Py, run the following line:
+Graphab4Py is available on `PyPI <https://pypi.org/project/graphab4py>`_. To install Graphab4Py, simply run the following line:
 
 .. code-block:: console
    
@@ -35,6 +40,7 @@ Example
 
    prj.create_graph(graphname = "G1")
    
-===
-End
-===
+=======
+License
+=======
+This is free and unencumbered software released into the public domain, as declared in the `LICENSE <https://github.com/ManuelPopp/graphab4py/blob/main/LICENSE>`_ file.
