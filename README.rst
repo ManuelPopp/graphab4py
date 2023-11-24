@@ -13,7 +13,7 @@ Graphab4Py is available on `PyPI <https://pypi.org/project/graphab4py>`_. To ins
 =======
 Example
 =======
-``
+..code-block:: [Python]
 from graphab4py import project
 project.set_graphab("/home/rca/opt/")
 prj = project.Project()
@@ -26,4 +26,3 @@ prj.create_linkset(
     threshold = 1000,
     cost_raster = "/home/rca/dat/res/resistance_surface.tif"
     )
-``
