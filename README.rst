@@ -14,16 +14,15 @@ Graphab4Py is available on `PyPI <https://pypi.org/project/graphab4py>`_. To ins
 Example
 =======
 .. code-block:: python
-
-from graphab4py import project
-project.set_graphab("/home/rca/opt/")
-prj = project.Project()
-prj.create_project(
-    name = "MyProject", patches = "/home/rca/dat/pat/Patches.tif", habitat = 1, directory = "/home/rca/prj"
-    )
-prj.create_linkset(
-    disttype = "cost",
-    linkname = "L1",
-    threshold = 1000,
-    cost_raster = "/home/rca/dat/res/resistance_surface.tif"
-    )
+    from graphab4py import project
+    project.set_graphab("/home/rca/opt/")
+    prj = project.Project()
+    prj.create_project(
+        name = "MyProject", patches = "/home/rca/dat/pat/Patches.tif", habitat = 1, directory = "/home/rca/prj"
+        )
+    prj.create_linkset(
+        disttype = "cost",
+        linkname = "L1",
+        threshold = 1000,
+        cost_raster = "/home/rca/dat/res/resistance_surface.tif"
+        )
