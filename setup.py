@@ -27,7 +27,7 @@ setup(
       install_requires = [
           "numpy", "matplotlib"
           ],
-      packages = find_packages("src"),
+      packages = find_packages(),
       classifiers = [
           "Programming Language :: Python :: 3",
           "License :: OSI Approved :: Unlicense",
