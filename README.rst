@@ -7,6 +7,7 @@ This package provides a Python interface to the program `Graphab <https://source
 Installation
 ============
 Graphab4Py is available on `PyPI <https://pypi.org/project/graphab4py>`_. To install Graphab4Py, run the following line:
+
 .. code-block:: shell
    pip install graphab4py
 
