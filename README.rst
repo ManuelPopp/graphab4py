@@ -1,7 +1,7 @@
 =====
 About
 =====
-This package provides a Python interface to the program Graphab (https://sourcesup.renater.fr/www/graphab/en/home.html). The author(s) of this Python package are not developing Graphab.
+This package provides a Python interface to the program `Graphab <https://sourcesup.renater.fr/www/graphab/en/home.html/>`_. The author(s) of this Python package are not developing Graphab.
 
 ============
 Installation
