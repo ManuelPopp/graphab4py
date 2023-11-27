@@ -1209,7 +1209,9 @@ class Project():
             )
         
         try:
-            metric_value = float(proc_out.split(" ")[-1].strip())
+            metric_value = float(
+                proc_out.split(" ")[-1].strip().strip("}").strip("]")
+                )
             
             out = {"process_output" : proc_out,
                    "metric_value" : metric_value}
@@ -1217,6 +1219,12 @@ class Project():
         except:
             if "Exception" in proc_out:
                 out = proc_err
+                
+                if "Access is denied" in proc_out:
+                    raise Exception(
+                        "Directory not writeable. Access is denied."
+                        )
+            
             else:
                 out = proc_out
         

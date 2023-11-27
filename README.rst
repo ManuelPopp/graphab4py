@@ -63,7 +63,7 @@ In the following, we will create a new Graphab project from scratch.
 In this example, Graphab has already been downloaded and saved to a folder named `"/home/rca/opt/"`.
 In a first step, Graphab4py is pointed to this folder. ALternatively, the `get_graphab()` function can be used to download Graphab to a specific location.
 Subsequently, the project is initialized. Here, the project is given a name and a project folder is created. Moreover, a file containing habitat patches must be provided.
-This file is a raster (e.g., a GeoTIFF *.tif file) with values encoded as INT2S. (Graphab does not accept another format.) The value or values for habitat patches must also be provided.
+This file is a raster (e.g., a GeoTIFF \*.tif file) with values encoded as INT2S. (Graphab does not accept another format.) The value or values for habitat patches must also be provided.
 Now, we create a linkset. The values allowed for `disttype` are `"euclid"` and `"cost"`, which refer to euclidean distance and cumulated cost.
 For a linkset based on euclidean distances, the `cost_raster` argument is not used. When, instead, a resistance surface is used, it needs to be provided as a raster file, as indicated in the example.
 Moreover, a threshold can be set, to limit the distance for which links are calculated. This may be necessary when dealing with large sets of habitat patches in order to limit computing time.
@@ -71,7 +71,7 @@ Finally, we create a graph and save the project.
 
 Loading an existing project
 +++++++++++++++++++++++++++
-Graphab4py can load existing Graphab projects (*.xml). However, it also has its own format (*.g4p) to save and load projects.
+Graphab4py can load existing Graphab projects (\*.xml). However, it also has its own format (\*.g4p) to save and load projects.
 .. code-block:: python
    
    import graphab4py
@@ -84,7 +84,8 @@ Graphab4py can load existing Graphab projects (*.xml). However, it also has its 
    
    prj.convert_distance(500, regression = "log")
    
-   prj.calculate_metric(metric = "EC", d = 1500, p = 0.05)
+   out = prj.calculate_metric(metric = "EC", d = 1500, p = 0.05)
+   ec = out["metric_value"]
    
 In this example, we load a project from a Graphab4py project file. Subsequently, we use the linkset that we have created in the previous step to establish a relationship between euclidean and cost distance.
 We can set limits to the euclidean distance considered for fitting the model, in order to fit the model to a relevant interval of our data.
@@ -94,7 +95,7 @@ We can use the `convert_distance` function directly to establish a relationship 
 If no relationship for the given distance interval and regression model has established so far, the method will internally call `enable_distance_conversion` and pass the required arguments.
 Note that changing the distance interval will overwrite any previously fit model for the same linkset and model type.
 In the last line, we calculate the metric "equivalent connectivity" (EC) for the entire graph. This metric requires additional parameters `d` and `p`.
-Other metrics might not require additional parameters. A list of all the available metrics and their parameters and properties can be viewed in the original `Graphab manual <https://sourcesup.renater.fr/www/graphab/en/home.html>`_.
+Other metrics might not require additional parameters. A list of all the available metrics and their parameters and properties can be viewed in the original `Graphab manual <https://sourcesup.renater.fr/www/graphab/en/documentation.html>`_.
 
 =======
 License
