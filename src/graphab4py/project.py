@@ -621,8 +621,18 @@ class Project():
             process_ids.append(pid)
             
             proc_out_b, proc_err_b = process.communicate()
-            proc_out = proc_out_b.decode("utf-8")
-            proc_err = proc_err_b.decode("utf-8")
+            
+            try:
+                proc_out = proc_out_b.decode("utf-8")
+            
+            except AttributeError:
+                proc_out = proc_out_b
+            
+            try:
+                proc_err = proc_err_b.decode("utf-8")
+            except AttributeError:
+                proc_err = proc_err_b
+            
             process_ids.pop()
         
         except FileNotFoundError:
@@ -1199,15 +1209,16 @@ class Project():
             )
         
         try:
-            out_text = proc_out.decode("utf-8")
-            
-            metric_value = float(out_text.split(" ")[-1].strip())
+            metric_value = float(proc_out.split(" ")[-1].strip())
             
             out = {"process_output" : proc_out,
                    "metric_value" : metric_value}
         
         except:
-            out = proc_out.decode("utf-8")
+            if "Exception" in proc_out:
+                out = proc_err
+            else:
+                out = proc_out
         
         return out
     
