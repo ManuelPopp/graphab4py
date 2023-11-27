@@ -29,9 +29,10 @@ Example
 =======
 .. code-block:: python
    
-   from graphab4py import project
-   project.set_graphab("/home/rca/opt/")
-   prj = project.Project()
+   import graphab4py
+   graphab4py.set_graphab("/home/rca/opt/")
+   graphab4py.set_graphab("/home/rca/opt/")
+   prj = graphab4py.Project()
    
    prj.create_project(
        name = "MyProject", patches = "/home/rca/dat/pat/Patches.tif",
