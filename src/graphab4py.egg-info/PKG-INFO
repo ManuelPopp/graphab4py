@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: graphab4py
-Version: 1.0.2b0
+Version: 1.0.2rc0
 Summary: A Python package to execute Graphab analyses.
 Home-page: https://github.com/ManuelPopp/graphab4py
 Author: Manuel R. Popp
@@ -17,6 +17,7 @@ Description-Content-Type: text/x-rst
 License-File: LICENSE
 Requires-Dist: numpy
 Requires-Dist: matplotlib
+Requires-Dist: xmltodict
 
 .. image:: /docs/img/Ga4Py.png
    :width: 600
@@ -32,7 +33,7 @@ This package provides a Python interface to the program `Graphab <https://source
 =============
 Prerequisites
 =============
-In order to install and use Graphab4py, `Python <https://www.python.org>`_ >= 3.9 and `Java <https://www.java.com>`_ >= 8 are both required. It is also recommended to have `pip <https://pip.pypa.io/en/stable/installation/>`_ available to install the latest version of Graphab4py. Graphab is not required but can be installed through Graphab4py. Alternatively, an existing Graphab Java executable can be set up for use in Graphab4py.
+In order to install and use Graphab4py, `Python <https://www.python.org>`_ >= 3.8 and `Java <https://www.java.com>`_ >= 8 are both required. It is also recommended to have `pip <https://pip.pypa.io/en/stable/installation/>`_ available to install the latest version of Graphab4py. Graphab is not required but can be installed through Graphab4py. Alternatively, an existing Graphab Java executable can be set up for use in Graphab4py.
 
 ============
 Installation

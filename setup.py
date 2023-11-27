@@ -19,13 +19,13 @@ dir_main = os.path.abspath(os.path.dirname(__file__))
 
 setup(
       name = "graphab4py",
-      version = "1.0.2b0",
+      version = "1.0.2c0",
       author = "Manuel R. Popp",
       author_email = "requests@cdpopp.de",
       description = "A Python interface to Graphab.",
       long_description = open("README.rst").read(),
       install_requires = [
-          "numpy", "matplotlib"
+          "numpy", "matplotlib", "xmltodict"
           ],
       package_dir = {"": "src"},
       packages = find_packages("./src"),

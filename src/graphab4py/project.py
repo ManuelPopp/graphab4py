@@ -14,12 +14,18 @@ __status__ = "Development"
 
 #-----------------------------------------------------------------------------|
 import os, sys, re, glob, platform, subprocess, signal, warnings, csv
+import xmltodict
+import xml.etree.ElementTree as ET
 from urllib.request import urlretrieve
 import numpy as np
 import pickle as pk
 import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+
+except:
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
 
 process_ids = []
 
@@ -309,6 +315,72 @@ class DistanceConverter():
                  lower_limit = None,
                  upper_limit = None
                  ):
+        '''
+        Create a DistanceConverter object to translate euclidean distances into
+        estimated cost distances.
+        
+        Parameters
+        ----------
+        linkset_info : str
+            Linkset data file containing distance values for each link.
+        regression : str {"linzero", "linear", "log-log"}
+            Type of the regression model. Must be "linzero" for linear
+            regression through the origin, "linear" for ordinary linear
+            regression, or "log-log" for regression in double-log-transformed
+            space.
+        lower_limit : numeric, optional
+            Minimum euclidean distance to consider for the regression.
+            The default is None.
+        upper_limit : numeric, optional
+            Maximum euclidean distance to consider for the regression.
+            The default is None.
+        
+        Raises
+        ------
+        TypeError
+            DESCRIPTION.
+        ValueError
+            DESCRIPTION.
+        
+        Returns
+        -------
+        None.
+
+        '''
+        # Check input
+        if lower_limit is not None:
+            try:
+                lower_limit = float(lower_limit)
+            
+            except:
+                t = type(lower_limit)
+                raise TypeError(
+                    f"Invalid data type {t} for 'lower_limit'. Must be numeric."
+                    )
+            
+            if lower_limit < 0:
+                raise ValueError(
+                    f"Invalid value for {lower_limit}. Must be positive."
+                    )
+        
+        if upper_limit is not None:
+            try:
+                upper_limit = float(upper_limit)
+            
+            except:
+                t = type(upper_limit)
+                raise TypeError(
+                    f"Invalid data type {t} for 'upper_limit'. Must be numeric."
+                    )
+            
+            if upper_limit < 0:
+                raise ValueError(
+                    f"Invalid value for {upper_limit}. Must be positive."
+                    )
+        
+        self.limits = [lower_limit, upper_limit]
+        
+        # Open data table
         with open(linkset_info, newline = "\n") as f:
             reader = csv.reader(f, delimiter = ",", quotechar = '"')
             
@@ -337,6 +409,7 @@ class DistanceConverter():
             self.dist = dist[indices]
             self.distM = distM[indices]
         
+        # Fit model
         if regression.lower() == "linzero":
             self.regression = "linzero"
             self.x, self.y = self.distM, self.dist
@@ -370,6 +443,19 @@ class DistanceConverter():
             raise ValueError(f"Invalid value '{regression}'.")
     
     def predict_cost(self, x):
+        '''
+        Estimate cumulative cost for a given euclidean distance "x".
+        
+        Parameters
+        ----------
+        x : numeric
+            Euclidean distance.
+        
+        Returns
+        -------
+        y : float
+            Estimated cumulative cost.
+        '''
         if self.regression == "linzero":
             y = self.params[0] * x
         
@@ -382,6 +468,13 @@ class DistanceConverter():
         return y
     
     def show_plot(self):
+        '''
+        Distplay regression plot.
+        
+        Returns
+        -------
+        None.
+        '''
         if self.regression == "log":
             xlab = "log distance"
             ylab = "log cumulative cost"
@@ -397,6 +490,17 @@ class DistanceConverter():
         plt.show()
     
     def save_plot(self, file):
+        '''
+        Save regression plot to file.
+        
+        Parameters
+        ----------
+        file : str
+            Output file.
+        Returns
+        -------
+        None.
+        '''
         if self.regression == "log":
             xlab = "log DistM"
             ylab = "log Dist"
@@ -412,6 +516,7 @@ class DistanceConverter():
 
 class Project():
     def __init__(self):
+        self.dist_converters = None
         pass
     
     def _base_call(self, java = None, memory = None, cores = None,
@@ -732,6 +837,78 @@ class Project():
                 "(must be either *.xml or *.g4p)."
                 )
     
+    def load_project_xml(self, project_file, **ga_settings):
+        '''
+        Load an existing Graphab project.
+        
+        Parameters
+        ----------
+        project_file : str
+            File path of the project file (either an *.xml or a *.g4p file).
+        
+        Returns
+        -------
+        None.
+        '''
+        if os.path.isfile(project_file):
+            dir_f = project_file
+        
+        elif os.path.isfile(os.path.join(os.getcwd(), project_file)):
+            dir_f = os.path.join(os.getcwd(), project_file)
+        
+        else:
+            raise FileNotFoundError(f"File not found: {project_file}.")
+        
+        if os.path.splitext(dir_f)[1] == ".g4p":
+            with open(dir_f, "rb") as f:
+                proj = pk.load(f)
+            
+            self.__dict__.update(proj.__dict__)
+        
+        elif os.path.splitext(dir_f)[1] == ".xml":
+            self.name = os.path.basename(os.path.splitext(dir_f)[0])
+            
+            tree = ET.parse(project_file)
+            xml_data = tree.getroot()
+            xml = ET.tostring(xml_data, encoding = "utf-8", method = "xml")
+            data = dict(xmltodict.parse(xml))
+            prj_info = data["Project"]
+            self.patches = None
+            self.habitat = int(prj_info["patchCodes"]["int"])
+            self.nomerge = not bool(prj_info["merge"])
+            self.nodata = prj_info["noData"]
+            minarea = float(prj_info["minArea"])
+            self.minarea = None if minarea == 0 else minarea
+            maxsize = float(prj_info["maxSize"])
+            self.maxsize = None if maxsize == 0 else maxsize
+            self.connexity = 8 if prj_info["con8"] == "true" else 4
+            self.directory = os.path.dirname(project_file)
+            self.project_file = project_file
+            
+            if "costLinks" in prj_info.keys():
+                entry = prj_info["costLinks"]["entry"]
+                if isinstance(entry, list):
+                    self.linksets = [ls["Linkset"]["name"] for ls in entry]
+                    
+                elif isinstance(entry, dict):
+                    self.linksets = [entry["Linkset"]["name"]]
+            
+            if "graphs" in prj_info.keys():
+                entry = prj_info["graphs"]["entry"]
+                if isinstance(entry, list):
+                    self.graphs = [g["Graph"]["name"] for g in entry]
+                
+                elif isinstance(entry, dict):
+                    self.graphs = [entry["Graph"]["name"]]
+            
+            if "pointsets" in prj_info.keys():
+                entry = prj_info["pointsets"]["entry"]
+                if isinstance(entry, list):
+                    self.pointsets = [p["Pointset"]["name"] for p in entry]
+                
+                elif isinstance(entry, dict):
+                    self.pointsets = [entry["Pointset"]["name"]]
+    
     def save(self):
         '''
         Save current instance.
@@ -911,7 +1088,13 @@ class Project():
         else:
             self.graphs.append(graphname)
         
-        return proc_out
+        if "Exception" in proc_out:
+            warnings.warn(proc_err)
+        
+        elif "100%" in proc_out:
+            print("Graph created.")
+        
+        return
     
     def calculate_metric(self, metric, linkset = None, graph = None,
                          mtype = "global", **metric_args):
@@ -1122,11 +1305,14 @@ class Project():
         
         return
     
-    def distance_conversion(self,
+    def enable_distance_conversion(self,
                             linkset = None,
-                            regression = "linorig",
+                            regression = "linzero",
                             show_plot = False,
-                            save_plot = False
+                            save_plot = False,
+                            min_euc = None,
+                            max_euc = None,
+                            **kwargs# Make sure a dict can be passed w/out error
                             ):
         '''
         Establish a relationship between euclidean and cost distance.
@@ -1139,6 +1325,10 @@ class Project():
             Regression type. One in log (log-log regression), linear (simple
             linear regression), or linorig (linear regression forced through
             the origin). The default is "linearzero".
+        min_euc : float, optional
+            Minimum euclidean distance to consider for the regression.
+        max_euc : float, optional
+            Maximum euclidean distance to consider for the regression.
         
         Returns
         -------
@@ -1165,10 +1355,120 @@ class Project():
             linkset + "-links.csv"
             )
         
-        self.DistConv = DistanceConverter(linkset_info, regression)
+        if not isinstance(self.dist_converters, dict):
+            self.dist_converters = dict()
+            self.dist_converters[linkset] = dict()
+        
+        elif not isinstance(self.dist_converters[linkset], dict):
+            self.dist_converters[linkset] = dict()
+        
+        self.dist_converters[linkset][regression] = DistanceConverter(
+            linkset_info, regression,
+            lower_limit = min_euc, upper_limit = max_euc
+            )
         
         if show_plot:
-            self.DistConv.show_plot()
+            self.dist_converters[linkset][regression].show_plot()
         
         if save_plot:
-            self.DistConv.show_plot(save_plot)
+            self.dist_converters[linkset][regression].save_plot(save_plot)
+        
+    def convert_distance(self,
+                         x,
+                         linkset = None,
+                         regression = "linzero",
+                         show_plot = False,
+                         save_plot = False,
+                         min_euc = None,
+                         max_euc = None):
+        '''
+        Estimate the cumulative cost along an euclidean distance. If no
+        euclid-to-cost relationship has been established yet, the method first
+        calls enable_distance_conversion().
+        
+        Parameters
+        ----------
+        x : numeric
+            Euclidean distance for which cumulative cost is to be estimated.
+        linkset : str, optional
+            Name of the linkset to use. The default is None.
+        regression : str in {log, linear, linearzero}, optional
+            Regression type. One in log (log-log regression), linear (simple
+            linear regression), or linorig (linear regression forced through
+            the origin). The default is "linearzero".
+        min_euc : float, optional
+            Minimum euclidean distance to consider for the regression.
+        max_euc : float, optional
+            Maximum euclidean distance to consider for the regression.
+        
+        Returns
+        -------
+        cost : float
+            Estimated cumulative cost corresponding to an euclidean distance
+            of "x".
+        '''
+        try:
+            x = float(x)
+        
+        except:
+            t = type(x)
+            raise TypeError(f"Invalid data type {t} for argument 'x'.")
+        
+        if x < 0.:
+            raise ValueError(
+                "Distance 'x' must be positive. Negative value {x} provided."
+                )
+        
+        if self.linksets is None:
+            mssg = "No linksets were created yet. Use create_linkset to " + \
+                "create a linkset first."
+            
+            raise Exception(mssg)
+        
+        elif linkset is None:
+            linkset = self.linksets[0]
+        
+        elif linkset not in self.linksets:
+            mssg = f"Linkset '{linkset}' not found. Use create_linkset to " + \
+                "create a new linkset or call attribute .linksets to list " + \
+                    "existing linksets."
+            
+            raise ValueError(mssg)
+        
+        try:
+            try:
+                limits = self.dist_converters[linkset][regression].limits
+            
+            except:
+                raise Warning(
+                    "No euclid-to-cost relationship established yet. " +
+                    "Regression will be started. This might take a moment."
+                    )
+            
+            if min_euc is not None:
+                if min_euc != limits[0]:
+                    raise Warning(
+                    f"New lower limit {min_euc} set. New regression model is" +
+                    " being fit."
+                    )
+            
+            if max_euc is not None:
+                if max_euc != limits[1]:
+                    raise Warning(
+                    f"New upper limit {max_euc} set. New regression model is" +
+                    " being fit."
+                    )
+            
+            cost = self.dist_converters[linkset][regression].predict_cost(x)
+        
+        except Warning as w:
+            warnings.warn(w)
+            arguments = locals()
+            x = arguments.pop("x")
+            _ = arguments.pop("self")
+            _ = arguments.pop("w")
+            self.enable_distance_conversion(**arguments)
+            
+            cost = self.dist_converters[linkset][regression].predict_cost(x)
+        
+        return cost
