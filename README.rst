@@ -52,4 +52,3 @@ Example
 License
 =======
 This is free and unencumbered software released into the public domain, as declared in the `LICENSE <https://github.com/ManuelPopp/graphab4py/blob/main/LICENSE>`_ file.
-
