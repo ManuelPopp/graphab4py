@@ -21,40 +21,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-java = "/usr/bin/java" if platform.system() == "Linux" else "java"
-_init_dir = os.path.dirname(__file__)
-
-try:
-    with(open(os.path.join(_init_dir, "Settings.pkl")), "rb") as f:
-        ga_settings = pk.read(f)
-
-except:
-    mssg = "No previous Graphab4py settings found. " + \
-        "Use get_graphab() to download Graphab or set_graphab() to point" + \
-            " Graphab4py to an existing Graphab installation."
-    print(mssg)
-
-try:
-    ga_settings = {"java" : java,
-                   "memory" : None,
-                   "cores" : None,
-                   "graphab" : None
-                   }
-
-except:
-    ga_settings = {"java" : None,
-                   "memory" : None,
-                   "cores" : None,
-                   "graphab" : None
-                   }
-    
-    warnings.warn(
-        " ".join(
-            ["Unable to locate Java. Please set path to Java manually." +
-             "To do so, assign the path to graphab4py.ga_settings['java']."]
-            )
-        )
-
 process_ids = []
 
 def sigterm_handler(signum, frame):
@@ -65,11 +31,142 @@ def sigterm_handler(signum, frame):
 
 signal.signal(signal.SIGTERM, sigterm_handler)
 
+_cfg_dir = os.path.join(os.path.dirname(__file__), "etc")
+_cfg_file = "Settings.cfg"
+
+if not os.path.exists(_cfg_dir):
+    os.makedirs(_cfg_dir)
+
 #-----------------------------------------------------------------------------|
 # Functions
+def _get_settings(file = os.path.join(_cfg_dir, _cfg_file), silent = False):
+    '''
+    Read Graphab4py settings from config directory.
+    
+    Parameters
+    ----------
+    file : str, optional
+        Config file. The default is os.path.join(_cfg_dir, _cfg_file).
+    
+    silent : bool
+        Return message if the config file was not found. The default is False.
+    
+    Returns
+    -------
+    ga_settings : dict
+        Graphab4py settings.
+    '''
+    if os.path.isfile(file):
+        with open(file, "rb") as f:
+            ga_settings = pk.load(f)
+    
+    else:
+        if not silent:
+            warnings.warn(
+                f"No config file found at {file}. Returning default."
+                )
+        
+        ga_settings = {"java" : None,
+                       "memory" : None,
+                       "cores" : None,
+                       "graphab" : None
+                       }
+    
+    return ga_settings
+
+def _write_settings(settings, file = os.path.join(_cfg_dir, _cfg_file)):
+    try:
+        with open(file, "wb") as f:
+            pk.dump(settings, f)
+    
+    except:
+        print(f"Info: Failed to save Graphab settings to {file}.")
+
+def _delete_settings(file = os.path.join(_cfg_dir, _cfg_file)):
+    '''
+    Delete config file.
+    
+    Parameters
+    ----------
+    file : str, optional
+        File location. The default is os.path.join(_cfg_dir, _cfg_file).
+    
+    Returns
+    -------
+    None.
+    '''
+    os.remove(file)
+
+def try_java(java):
+    '''
+    Try to receive and print the Java version from the given path or shortcut.
+    
+    Parameters
+    ----------
+    java : str
+        Path or shortcut to Java executable.
+    
+    Raises
+    ------
+    FileNotFoundError
+        Raises error if Python fails to contact Java via subprocess and to
+        return the Java version.
+    
+    Returns
+    -------
+    None.
+    '''
+    try:
+        out = subprocess.run(
+            [java, "-version"], stderr = subprocess.PIPE, text = True
+            )
+        
+        version_line = out.stderr.splitlines()[0]
+        version = version_line.split()[2].strip('""')
+        
+        print(f"Found Java version {version}.")
+    
+    except:
+        raise FileNotFoundError(java)
+
+def set_java(path):
+    '''
+    Set Java executable. This approach will set the Jaca path across sessions.
+    
+    Parameters
+    ----------
+    path : str
+        Path or shortcut to Java executable.
+    
+    Raises
+    ------
+    Exception
+        FileNotFoundError.
+        Raises error if Python fails to contact Java via subprocess and to
+        return the Java version.
+    
+    Returns
+    -------
+    None.
+    '''
+    try:
+        try_java(path)
+        
+        global ga_settings
+        ga_settings["java"] = path
+        
+        _ga_settings = _get_settings(silent = True)
+        _ga_settings["java"] = path
+        
+        _write_settings(_ga_settings)
+    
+    except FileNotFoundError:
+        raise Exception(f"Unable to locate Java at {path}.")
+    
 def set_graphab(path):
     '''
-    Set directory to Graphab.
+    Set directory to Graphab. This approach will set the Graphab path across
+    sessions.
     
     Parameters
     ----------
@@ -105,29 +202,25 @@ def set_graphab(path):
         elif len(ga_file) < 1:
             mssg = f"Failed to locate Graphab within {ga_file}."
             
-            raise Exception(mssg)
+            raise FileNotFoundError(mssg)
         
         path = ga_file[0]
     
     elif os.path.isfile(path):
         if os.path.splitext(path)[1] != ".jar":
             
-            raise Exception("Graphab file must be a *.jar file.")
+            raise ValueError("Graphab file must be a *.jar file.")
     
     else:
-        raise Exception(f"No such file or directory: {path}.")
+        raise FileNotFoundError(f"No such file or directory: {path}.")
     
     global ga_settings
     ga_settings["graphab"] = path
     
-    settings_file = os.path.join(_init_dir, "Settings.pkl")
+    _ga_settings = _get_settings(silent = True)
+    _ga_settings["graphab"] = path
     
-    try:
-        with open(settings_file, "wb") as f:
-            pk.dump(ga_settings, f)
-    
-    except:
-        print("Info: Failed to save Graphab settings to {settings_file}.")
+    _write_settings(_ga_settings)
     
     return
 
@@ -155,12 +248,57 @@ def get_graphab(directory):
         )
     
     print("Downloading Graphab...")
-    url = "https://thema.univ-fcomte.fr/productions/download.php?name=graphab&version=2.8&username=Graph4lg&institution=R"
+    url = "https://thema.univ-fcomte.fr/productions/" + \
+        "download.php?name=graphab&version=2.8&username=Graph4lg&institution=R"
     exit_status = urlretrieve(url, filename)
     
     set_graphab(filename)
     
     return exit_status
+
+#-----------------------------------------------------------------------------|
+# Settings
+ga_settings = _get_settings(silent = True)
+
+if ga_settings["graphab"] is None:
+    mssg = "No previous Graphab4py settings found. " + \
+        "Use get_graphab() to download Graphab or set_graphab() to point" + \
+            " Graphab4py to an existing Graphab installation."
+    
+    print(mssg)
+
+sys_java = "/usr/bin/java" if platform.system() == "Linux" else "java"
+java_warning = "Unable to locate Java. Please set\n" + \
+"graphab4py.project.ga_settings['java'] = '/path/to/java'\n" + \
+"to set the path for this session. In order to store the Java " + \
+"path across sessions, use graphab4py.project.set_java(). Graphab4py may " + \
+"try to locate a Java executable, but this is less secure than setting a path."
+
+if "java" not in ga_settings.keys():
+    try:
+        try_java(sys_java)
+        
+        ga_settings = {"java" : sys_java,
+                       "memory" : None,
+                       "cores" : None,
+                       "graphab" : None
+                       }
+    
+    except FileNotFoundError:
+        warnings.warn(
+            message = java_warning,
+            category = UserWarning
+            )
+
+else:
+    try:
+        try_java(ga_settings["java"])
+    
+    except FileNotFoundError:
+        warnings.warn(
+            message = java_warning,
+            category = UserWarning
+            )
 
 #-----------------------------------------------------------------------------|
 # Classes
@@ -315,7 +453,20 @@ class Project():
             current_settings.update(settings)
         
         java = current_settings["java"]
+        
+        if java is None:
+            try:
+                global sys_java
+                try_java(sys_java)
+                java = sys_java
+            
+            except:
+                raise Exception("Java path not set. Use set_java().")
+        
         graphab = current_settings["graphab"].replace("\\", "/")
+        
+        if graphab is None:
+            raise Exception("Graphab directory not set. Use set_graphab().")
         
         if "mpi" in kwargs.keys():
             mpi = kwargs["mpi"]
@@ -364,15 +515,19 @@ class Project():
             global process_ids
             process_ids.append(pid)
             
-            proc_out, proc_err = process.communicate()
+            proc_out_b, proc_err_b = process.communicate()
+            proc_out = proc_out_b.decode("utf-8")
+            proc_err = proc_err_b.decode("utf-8")
             process_ids.pop()
         
         except FileNotFoundError:
-            proc_out = 1
             
-            raise FileNotFoundError(f"Cannot find {java}.")
+            raise FileNotFoundError(f"Unable to locate {java}.")
         
-        return proc_out
+        if "Exception" in proc_err:
+            warnings.warn(proc_err)
+        
+        return proc_out, proc_err
     
     def create_project(self,
                        name,
@@ -384,6 +539,7 @@ class Project():
                        maxsize = None,
                        connexity = 8,
                        directory = None,
+                       overwrite = False,
                        **ga_settings
                        ):
         '''
@@ -412,6 +568,9 @@ class Project():
         directory : str, optional
             Directory in which the project shall be created. If set to none,
             the current working directory is used. The default is None.
+        overwrite : bool, optional
+            Overwrite Graphab project if a project already exists at the
+            given location.
         **ga_settings : dict
             Dictionary containing Graphab settings.
         
@@ -435,6 +594,31 @@ class Project():
         self.graphs = None
         self.pointsets = None
         
+        if not os.path.isdir(self.directory):
+            try:
+                os.makedirs(self.directory, exist_ok = False)
+            
+            except:
+                in_dir = self.directory
+                self.directory = None
+                
+                raise Exception(f"Cannot create directory {in_dir}.")
+        
+        if os.path.isfile(self.project_file):
+            if overwrite:
+                warnings.warn(
+                    f"Project {self.project_file} already exists and will be" +
+                    "replaced."
+                    )
+            
+            else:
+                warnings.warn(
+                    f"Project {self.project_file} already exists. " +
+                    "To overwrite it, use 'overwrite' = True."
+                    )
+                
+                return
+        
         project_settings = [name,
                             patches,
                             f"habitat={habitat}"
@@ -457,18 +641,30 @@ class Project():
         
         project_settings += [f"dir={directory}"]
         
-        proc_out = self._base_call(**ga_settings, create = project_settings)
+        proc_out, proc_err = self._base_call(
+            **ga_settings, create = project_settings
+            )
         
         out = {"process_output" : proc_out,
                "project_file" : os.path.join(directory, name, name + ".xml")
                }
         
-        if not os.path.isfile(self.project_file):
-            mssg = "Failed to create Graphab project. Graphab output: {}"
-            
-            raise Exception(mssg.format(proc_out))
+        if "not integer" in proc_err:
+            raise TypeError(
+                f"Invalid data type for {patches}. " +
+                "Raster values must be INT2S."
+                )
         
-        return out
+        if not os.path.isfile(self.project_file):
+            raise Exception(
+                "Failed to create Graphab project. " +
+                "Graphab output: {proc_out}."
+                )
+        
+        if "project_file" in out:
+            print("Project created.")
+        
+        return
     
     def load_project(self, project_file, **ga_settings):
         '''
@@ -501,15 +697,16 @@ class Project():
         elif os.path.splitext(dir_f)[1] == ".xml":
             self.name = os.path.basename(os.path.splitext(dir_f)[0])
             
-            out = self._base_call(
+            proc_out, proc_err = self._base_call(
                 **ga_settings, project = project_file, show = []
                 )
             
-            out_components = re.split(r"\=+", str(out))
+            out_components = re.split(r"\=+", str(proc_out))
             output = [
                 o.replace("\\n", "").replace("\\r", "").strip(" ")
                 for o in out_components
                 ]
+            
             linksets_start = output.index("Link sets") + 1
             graphs_start = output.index("Graphs") + 1
             pointsets_start = output.index("Point sets") + 1
@@ -585,18 +782,50 @@ class Project():
         proc_out : bytes
             Process output.
         '''
+        disttype = disttype.lower()
+        
+        if disttype not in ["euclid", "cost"]:
+            raise ValueError(
+                f"Invalid value {disttype} to argument disttype." +
+                "Must be either 'euclid' or 'cost'."
+                )
+        
+        if disttype == "cost":
+            if isinstance(cost_raster, str):
+                if not os.path.isfile(cost_raster):
+                    raise FileNotFoundError(cost_raster)
+            
+            else:
+                t = type(cost_raster)
+                raise TypeError(
+                    f"Invalid data type {t} for argument cost_raster." +
+                    " Must be of type 'str'. Note that for disttype == " +
+                    "'cost', a resistance surface must be provided as a " +
+                    "raster file."
+                    )
+        
         link_settings = [f"distance={disttype}", f"name={linkname}"]
         
         if complete:
             link_settings += ["complete"]
         
-        link_settings += [f"maxcost={threshold}"]
+        if threshold:
+            try:
+                float(threshold)
+                link_settings += [f"maxcost={threshold}"]
+            
+            except:
+                raise TypeError(
+                    f"Invalid data type {t} provided to argument " +
+                    "'threshold'. Must be numeric."
+                    )
         
         if cost_raster is not None:
             link_settings += [f"extcost={cost_raster}"]
         
-        proc_out = self._base_call(**ga_settings, project = self.project_file,
-                             linkset = link_settings)
+        proc_out, proc_err = self._base_call(
+            **ga_settings, project = self.project_file, linkset = link_settings
+            )
         
         if self.linksets is None:
             self.linksets = [linkname]
@@ -604,7 +833,16 @@ class Project():
         else:
             self.linksets.append(linkname)
         
-        return proc_out
+        if "canceled" in proc_out:
+            raise Exception(
+                "Failed to create linkset. Check resistance surface." +
+                "Check input parameters and ressource usage."
+                )
+        
+        elif "100.0%" in proc_out:
+            print("Linkset created.")
+        
+        return
     
     def create_graph(self, graphname, linkset = None, nointra = True,
                      threshold = None, **ga_settings):
@@ -631,20 +869,20 @@ class Project():
             Process output.
         '''
         if self.linksets is None:
-            mssg = "No linksets were created yet. Use create_linkset to " + \
+            raise Exception(
+                "No linksets were created yet. Use create_linkset to " +
                 "create a linkset first."
-            
-            raise Exception(mssg)
+                )
         
         elif linkset is None:
             linkset = self.linksets[0]
         
         elif linkset not in self.linksets:
-            mssg = f"Linkset '{linkset}' not found. Use create_linkset to " + \
-                "create a new linkset or call attribute .linksets to list " + \
-                    "existing linksets."
-            
-            raise ValueError(mssg)
+            raise ValueError(
+                f"Linkset '{linkset}' not found. Use create_linkset to " +
+                "create a new linkset or call attribute .linksets to list " +
+                "existing linksets."
+                )
         
         graph_settings = [f"name={graphname}"]
         
@@ -652,10 +890,20 @@ class Project():
             graph_settings += ["nointra"]
         
         if threshold is not None:
-            graph_settings += [f"threshold={threshold}"]
+            try:
+                float(threshold)
+                graph_settings += [f"threshold={threshold}"]
+            
+            except:
+                t = type(threshold)
+                raise TypeError(
+                    f"Invalid data type {t} provided to argument 'threshold'."
+                    )
         
-        proc_out = self._base_call(**ga_settings, project = self.project_file,
-                             uselinkset = linkset, graph = graph_settings)
+        proc_out, proc_err = self._base_call(
+            **ga_settings, project = self.project_file, uselinkset = linkset,
+            graph = graph_settings
+            )
         
         if self.graphs is None:
             self.graphs = [graphname]
@@ -747,9 +995,10 @@ class Project():
             case _:
                 raise Exception(f"Illegal argument for mtype: {mtype}.")
         
-        proc_out = self._base_call(**ga_settings, project = self.project_file,
-                             uselinkset = linkset, usegraph = graph,
-                             **metric)
+        proc_out, proc_err = self._base_call(
+            **ga_settings, project = self.project_file, uselinkset = linkset,
+            usegraph = graph, **metric
+            )
         
         try:
             out_text = proc_out.decode("utf-8")
@@ -851,9 +1100,10 @@ class Project():
         
         delta_settings += [f"obj={obj}"]
         
-        proc_out = self._base_call(**ga_settings, project = self.project_file,
-                             uselinkset = linkset, usegraph = graph, mpi = mpi,
-                             delta = delta_settings)
+        proc_out, proc_err = self._base_call(
+            **ga_settings, project = self.project_file, uselinkset = linkset,
+            usegraph = graph, mpi = mpi, delta = delta_settings
+            )
         
         return
     

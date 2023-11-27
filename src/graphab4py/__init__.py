@@ -13,3 +13,4 @@ __email__ = "requests@cdpopp.de"
 __status__ = "Development"
 
 #-----------------------------------------------------------------------------|
+from .project import *

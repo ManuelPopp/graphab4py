@@ -19,7 +19,7 @@ dir_main = os.path.abspath(os.path.dirname(__file__))
 
 setup(
       name = "graphab4py",
-      version = "1.0.1b",
+      version = "1.0.1b1",
       author = "Manuel R. Popp",
       author_email = "requests@cdpopp.de",
       description = "A Python interface to Graphab.",
@@ -34,7 +34,7 @@ setup(
           "License :: OSI Approved :: Unlicense",
           "Operating System :: OS Independent"
           ],
-      python_requires = ">=3.9",
+      python_requires = ">=3.8",
       url = "https://github.com/ManuelPopp/graphab4py",
       keywords = ["Graphab", "Network analysis"]
       )
