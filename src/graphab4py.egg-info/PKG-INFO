@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: graphab4py
-Version: 1.0.1b1
+Version: 1.0.2b0
 Summary: A Python package to execute Graphab analyses.
 Home-page: https://github.com/ManuelPopp/graphab4py
 Author: Manuel R. Popp
@@ -49,12 +49,14 @@ Example
 =======
 .. code-block:: python
    
-   from graphab4py import project
-   project.set_graphab("/home/rca/opt/")
-   prj = project.Project()
+   import graphab4py
+   graphab4py.set_graphab("/home/rca/opt/")
+   graphab4py.set_graphab("/home/rca/opt/")
+   prj = graphab4py.Project()
    
    prj.create_project(
-       name = "MyProject", patches = "/home/rca/dat/pat/Patches.tif", habitat = 1, directory = "/home/rca/prj"
+       name = "MyProject", patches = "/home/rca/dat/pat/Patches.tif",
+       habitat = 1, directory = "/home/rca/prj"
        )
    
    prj.create_linkset(
@@ -63,11 +65,10 @@ Example
        threshold = 1000,
        cost_raster = "/home/rca/dat/res/resistance_surface.tif"
        )
-
+   
    prj.create_graph(graphname = "G1")
    
 =======
 License
 =======
 This is free and unencumbered software released into the public domain, as declared in the `LICENSE <https://github.com/ManuelPopp/graphab4py/blob/main/LICENSE>`_ file.
-

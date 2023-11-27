@@ -413,6 +413,7 @@ def calculate_metric(project, linkset, graph, metric, mtype = "global",
         else:
             metric_settings += ["{0}={1}".format(key, val)]
     
+    '''Python >= 10
     match mtype:
         case "global":
             metric = {"gmetric" : metric_settings}
@@ -425,6 +426,18 @@ def calculate_metric(project, linkset, graph, metric, mtype = "global",
         
         case _:
             raise Exception(f"Illegal argument for mtype: {mtype}.")
+    '''
+    if mtype == "global":
+        metric = {"gmetric" : metric_settings}
+    
+    elif mtype == "component":
+        metric = {"cmetric" : metric_settings}
+    
+    elif mtype == "local":
+        metric = {"lmetric" : metric_settings}
+    
+    else:
+        raise Exception(f"Illegal argument for mtype: {mtype}.")
     
     proc_out = base_call(**ga_settings, project = project,
                          uselinkset = linkset, usegraph = graph,

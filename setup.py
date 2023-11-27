@@ -19,7 +19,7 @@ dir_main = os.path.abspath(os.path.dirname(__file__))
 
 setup(
       name = "graphab4py",
-      version = "1.0.1b1",
+      version = "1.0.2b0",
       author = "Manuel R. Popp",
       author_email = "requests@cdpopp.de",
       description = "A Python interface to Graphab.",

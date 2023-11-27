@@ -982,6 +982,7 @@ class Project():
             else:
                 metric_settings += ["{0}={1}".format(key, val)]
         
+        '''Python >= 10
         match mtype:
             case "global":
                 metric = {"gmetric" : metric_settings}
@@ -994,6 +995,20 @@ class Project():
             
             case _:
                 raise Exception(f"Illegal argument for mtype: {mtype}.")
+        '''
+        # BEGIN ALTERNATIVE FOR OLD PYTHON VERSIONS
+        if mtype == "global":
+            metric = {"gmetric" : metric_settings}
+        
+        elif mtype == "component":
+            metric = {"cmetric" : metric_settings}
+        
+        elif mtype == "local":
+            metric = {"lmetric" : metric_settings}
+        
+        else:
+            raise Exception(f"Illegal argument for mtype: {mtype}.")
+        # END
         
         proc_out, proc_err = self._base_call(
             **ga_settings, project = self.project_file, uselinkset = linkset,
