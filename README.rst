@@ -34,7 +34,8 @@ Example
    prj = project.Project()
    
    prj.create_project(
-       name = "MyProject", patches = "/home/rca/dat/pat/Patches.tif", habitat = 1, directory = "/home/rca/prj"
+       name = "MyProject", patches = "/home/rca/dat/pat/Patches.tif",
+       habitat = 1, directory = "/home/rca/prj"
        )
    
    prj.create_linkset(
@@ -43,7 +44,7 @@ Example
        threshold = 1000,
        cost_raster = "/home/rca/dat/res/resistance_surface.tif"
        )
-
+   
    prj.create_graph(graphname = "G1")
    
 =======
