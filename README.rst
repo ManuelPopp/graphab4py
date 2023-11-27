@@ -3,6 +3,12 @@
    :align: center
    :alt: Graphab4py Logo
    
+.. role:: bash(code)
+   :language: bash
+
+.. role:: python(code)
+   :language: python
+
 
 =====
 About
