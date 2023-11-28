@@ -4,29 +4,24 @@
 .. role:: python(code)
    :language: python
 
-.. image:: /docs/img/Ga4Py.png
-   :width: 600
-   :align: center
-   :alt: Graphab4py Logo
+.. raw:: html
+
+   <p align="center">
+     <img src="/docs/img/Ga4Py.png" alt="Graphab4py Logo" width="400">
+   </p>
    
 
 ----
 
-`Supported Python Versions`_
-
-.. image:: https://img.shields.io/pypi/pyversions/numpy.svg
+.. image:: https://img.shields.io/pypi/pyversions/graphab4py.svg
    :target: https://pypi.org/project/graphab4py
 
 .. _Supported Python Versions: https://pypi.org/project/graphab4py
 
-`PyPI Downloads`_
-
-.. image:: https://img.shields.io/pypi/dm/numpy.svg?label=PyPI%20downloads
+.. image:: https://img.shields.io/pypi/dm/graphab4py.svg?label=PyPI%20downloads
    :target: https://pypi.org/project/graphab4py
 
 .. _PyPI Downloads: https://pypi.org/project/graphab4py
-
-`UNLICENSE`_
 
 .. image:: https://img.shields.io/badge/license-UNLICENSE-green.svg
    :target: https://unlicense.org/
