@@ -13,10 +13,18 @@
 
 ----
 
+.. image:: https://img.shields.io/pypi/v/graphab4py.svg
+   :target: https://pypi.org/project/graphab4py/
+
 .. image:: https://img.shields.io/pypi/pyversions/graphab4py.svg
    :target: https://pypi.org/project/graphab4py
 
 .. _Supported Python Versions: https://pypi.org/project/graphab4py
+
+.. image:: https://travis-ci.org/username/graphab4py.svg?branch=master
+   :target: https://travis-ci.org/username/graphab4py
+
+.. _Build Status: https://travis-ci.org/username/graphab4py
 
 .. image:: https://img.shields.io/pypi/dm/graphab4py.svg?label=PyPI%20downloads
    :target: https://pypi.org/project/graphab4py
