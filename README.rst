@@ -4,7 +4,8 @@
 .. role:: python(code)
    :language: python
 
-.. image:: "/docs/img/Ga4Py.png" alt="Graphab4py Logo" width="400">
+
+.. image:: ./docs/img/Ga4Py.png
    :align: center
    :alt: Logo
    :width: 400px
