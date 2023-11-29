@@ -4,11 +4,10 @@
 .. role:: python(code)
    :language: python
 
-.. raw:: html
-
-   <p align="center">
-     <img src="/docs/img/Ga4Py.png" alt="Graphab4py Logo" width="400">
-   </p>
+.. image:: "/docs/img/Ga4Py.png" alt="Graphab4py Logo" width="400">
+   :align: center
+   :alt: Logo
+   :width: 400px
    
 
 ----

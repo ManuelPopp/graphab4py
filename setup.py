@@ -23,12 +23,28 @@ setup(
       author = "Manuel R. Popp",
       author_email = "requests@cdpopp.de",
       description = "A Python interface to Graphab.",
-      long_description = open("README.rst").read(),
+      long_description = """
+      
+      graphab4py - A Python interface to Graphab
+      ==========================================
+      
+      Graphab4py provides a Python interface to Graphab, allowing users to perform
+      network analysis and related tasks.
+      
+      Features:
+      - Integration with Graphab algorithms
+      - Network analysis tools
+      - Visualization functions
+      
+      For more information, visit: https://github.com/ManuelPopp/graphab4py
+      
+      """,
       install_requires = [
           "numpy", "matplotlib", "xmltodict"
           ],
-      package_dir = {"": "src"},
+      package_dir = {"" : "src"},
       packages = find_packages("./src"),
+      exclude_package_data={"": ["./docs/*"]},
       classifiers = [
           "Programming Language :: Python :: 3",
           "License :: OSI Approved :: Unlicense",
