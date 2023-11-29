@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Sep 25 13:51:41 2023
-"""
+'''
+graphab4py - A Python interface to Graphab
+
+Graphab4py provides a Python interface to Graphab, allowing users to perform
+network analysis and related tasks.
+
+Features:
+- Integration with Graphab algorithms
+- Network analysis tools
+- Visualization functions
+
+For more information, visit: https://github.com/ManuelPopp/graphab4py
+'''
 __author__ = "Manuel"
 __date__ = "Mon Sep 25 13:51:41 2023"
 __credits__ = ["Manuel R. Popp"]
@@ -52,7 +62,7 @@ def _get_settings(file = os.path.join(_cfg_dir, _cfg_file), silent = False):
     Parameters
     ----------
     file : str, optional
-        Config file. The default is os.path.join(_cfg_dir, _cfg_file).
+        Config file.
     
     silent : bool
         Return message if the config file was not found. The default is False.
@@ -61,6 +71,7 @@ def _get_settings(file = os.path.join(_cfg_dir, _cfg_file), silent = False):
     -------
     ga_settings : dict
         Graphab4py settings.
+    
     '''
     if os.path.isfile(file):
         with open(file, "rb") as f:
@@ -95,11 +106,12 @@ def _delete_settings(file = os.path.join(_cfg_dir, _cfg_file)):
     Parameters
     ----------
     file : str, optional
-        File location. The default is os.path.join(_cfg_dir, _cfg_file).
+        File location.
     
     Returns
     -------
     None.
+    
     '''
     os.remove(file)
 
@@ -121,6 +133,7 @@ def try_java(java):
     Returns
     -------
     None.
+    
     '''
     try:
         out = subprocess.run(
@@ -154,6 +167,7 @@ def set_java(path):
     Returns
     -------
     None.
+    
     '''
     try:
         try_java(path)
@@ -177,7 +191,7 @@ def set_graphab(path):
     Parameters
     ----------
     path : str
-        Graphab *.jar file or directory containing exactly one version of
+        Graphab .jar file or directory containing exactly one version of
         Graphab.
     
     Raises
@@ -188,6 +202,7 @@ def set_graphab(path):
     Returns
     -------
     None.
+    
     '''
     if not isinstance(path, str):
         
@@ -232,7 +247,7 @@ def set_graphab(path):
 
 def get_graphab(directory):
     '''
-    Download the Graphab *.jar file.
+    Download the Graphab .jar file.
     
     Parameters
     ----------
@@ -243,6 +258,7 @@ def get_graphab(directory):
     -------
     exit_status : tuple
         (Directory, HTTPMessage)
+    
     '''
     if not (os.path.isdir(directory) or directory.endswith(".jar")):
         raise FileNotFoundError(
@@ -455,6 +471,7 @@ class DistanceConverter():
         -------
         y : float
             Estimated cumulative cost.
+
         '''
         if self.regression == "linzero":
             y = self.params[0] * x
@@ -474,6 +491,7 @@ class DistanceConverter():
         Returns
         -------
         None.
+
         '''
         if self.regression == "log":
             xlab = "log distance"
@@ -497,9 +515,11 @@ class DistanceConverter():
         ----------
         file : str
             Output file.
+        
         Returns
         -------
         None.
+
         '''
         if self.regression == "log":
             xlab = "log DistM"
@@ -534,14 +554,16 @@ class Project():
         cores : int, optional
             Number of CPU cores to provide to Graphab. The default is None.
         graphab : str, optional
-            Path to the Graphab *.jar file. The default is None.
-        **kwargs : dict, any
+            Path to the Graphab .jar file. The default is None.
+        
+        :param kwargs:
             Arguments to append to the Graphab call.
         
         Returns
         -------
         proc_out : bytes
             Process output.
+
         '''
         global ga_settings
         current_settings = ga_settings
@@ -686,13 +708,15 @@ class Project():
         overwrite : bool, optional
             Overwrite Graphab project if a project already exists at the
             given location.
-        **ga_settings : dict
+        
+        :param kwargs:
             Dictionary containing Graphab settings.
         
         Returns
         -------
         out : dict
             A dictionary containing process output and project name.
+
         '''
         self.name = name
         self.patches = patches
@@ -773,7 +797,7 @@ class Project():
         if not os.path.isfile(self.project_file):
             raise Exception(
                 "Failed to create Graphab project. " +
-                "Graphab output: {proc_out}."
+                f"Graphab output: {proc_out}."
                 )
         
         if "project_file" in out:
@@ -788,11 +812,12 @@ class Project():
         Parameters
         ----------
         project_file : str
-            File path of the project file (either an *.xml or a *.g4p file).
+            File path of the project file (either an .xml or a .g4p file).
         
         Returns
         -------
         None.
+
         '''
         if os.path.isfile(project_file):
             dir_f = project_file
@@ -844,7 +869,7 @@ class Project():
         else:
             raise ValueError(
                 "Project file path does not end with a valid extension" +
-                "(must be either *.xml or *.g4p)."
+                "(must be either .xml or .g4p)."
                 )
     
     def load_project_xml(self, project_file, **ga_settings):
@@ -854,11 +879,12 @@ class Project():
         Parameters
         ----------
         project_file : str
-            File path of the project file (either an *.xml or a *.g4p file).
+            File path of the project file (either an .xml or a .g4p file).
         
         Returns
         -------
         None.
+
         '''
         if os.path.isfile(project_file):
             dir_f = project_file
@@ -926,6 +952,7 @@ class Project():
         Returns
         -------
         None.
+
         '''
         try:
             file = os.path.join(self.directory, self.name + ".g4p")
@@ -960,14 +987,16 @@ class Project():
         complete : bool, optional
             Whether to create a complete linkset. The default is True.
         cost_raster : str, optional
-            Path to an external cost raster file (*.tif). The default is None.
-        **ga_settings : any
+            Path to an external cost raster file (.tif). The default is None.
+        
+        :param kwargs:
             Additional Graphab settings.
         
         Returns
         -------
         proc_out : bytes
             Process output.
+
         '''
         disttype = disttype.lower()
         
@@ -1047,13 +1076,15 @@ class Project():
         threshold : int, optional
             Maximum distance or maximum accumulated cost (depending on the type
             of distance). The default is None.
-        **ga_settings : any
+        
+        :param kwargs:
             Additional Graphab settings.
         
         Returns
         -------
         proc_out : bytes
             Process output.
+
         '''
         if self.linksets is None:
             raise Exception(
@@ -1123,15 +1154,16 @@ class Project():
             Metric name.
         mtype : str {local, global}
             Metric type.
-        **metric_args : dict
-            Metric paramneters.
-        **ga_settings : any
+        
+        :param kwargs:
+            Metric paramneters; 
             Additional Graphab settings.
         
         Returns
         -------
         out : dict
             A dictionary containing process output and project name.
+
         '''
         if self.linksets is None:
             mssg = "No linksets were created yet. Use create_linkset to " + \
@@ -1175,20 +1207,20 @@ class Project():
             else:
                 metric_settings += ["{0}={1}".format(key, val)]
         
-        '''Python >= 10
-        match mtype:
-            case "global":
-                metric = {"gmetric" : metric_settings}
-            
-            case "component":
-                metric = {"cmetric" : metric_settings}
-            
-            case "local":
-                metric = {"lmetric" : metric_settings}
-            
-            case _:
-                raise Exception(f"Illegal argument for mtype: {mtype}.")
-        '''
+        #Python >= 10
+        #match mtype:
+        #    case "global":
+        #        metric = {"gmetric" : metric_settings}
+        #    
+        #    case "component":
+        #        metric = {"cmetric" : metric_settings}
+        #    
+        #    case "local":
+        #        metric = {"lmetric" : metric_settings}
+        #    
+        #    case _:
+        #        raise Exception(f"Illegal argument for mtype: {mtype}.")
+        
         # BEGIN ALTERNATIVE FOR OLD PYTHON VERSIONS
         if mtype == "global":
             metric = {"gmetric" : metric_settings}
@@ -1251,21 +1283,22 @@ class Project():
             Restrict the calculation to items (patches or links) listed by
             identifier. The default is None.
         select_from_file : str, optional
-            Restrict the calculations on items listed in a *.txt file. The file
+            Restrict the calculations on items listed in a .txt file. The file
             must contain one identifier per line. The default is None.
         obj : str {patch, link}, optional
             Type of objects to remove. The default is "patch".
         mpi : bool, optional
             Run in MPI mode (on cluster).
-        **metric_args : dict
-            Metric paramneters.
-        **ga_settings : any
+        
+        :param kwargs:
+            Metric paramneters;
             Additional Graphab settings.
         
         Returns
         -------
         out : dict
             A dictionary containing process output and project name.
+
         '''
         if self.linksets is None:
             mssg = "No linksets were created yet. Use create_linkset to " + \
@@ -1352,6 +1385,7 @@ class Project():
         Returns
         -------
         None.
+
         '''
         if self.linksets is None:
             mssg = "No linksets were created yet. Use create_linkset to " + \
@@ -1425,6 +1459,7 @@ class Project():
         cost : float
             Estimated cumulative cost corresponding to an euclidean distance
             of "x".
+
         '''
         try:
             x = float(x)

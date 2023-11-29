@@ -7,7 +7,7 @@ __author__ = "Manuel"
 __date__ = "Tue Sep 26 15:04:27 2023"
 __credits__ = ["Manuel R. Popp"]
 __license__ = "Unlicense"
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 __maintainer__ = "Manuel R. Popp"
 __email__ = "requests@cdpopp.de"
 __status__ = "Development"
@@ -19,7 +19,7 @@ dir_main = os.path.abspath(os.path.dirname(__file__))
 
 setup(
       name = "graphab4py",
-      version = "1.0.3",
+      version = __version__,
       author = "Manuel R. Popp",
       author_email = "requests@cdpopp.de",
       description = "A Python interface to Graphab.",

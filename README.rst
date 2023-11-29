@@ -42,6 +42,8 @@ The author(s) of this Python package are not developing Graphab.
 Rather, Graphab is an independent software which provides a graphical user interface, as well as a command line interface.
 Further information on Graphab can be found `here <https://sourcesup.renater.fr/www/graphab/en/home.html>`_.
 
+Also view the `documentation <https://github.com/ManuelPopp/graphab4py/tree/main/docs/build/html/index.html>`_ of this Python package.
+
 =============
 Prerequisites
 =============
