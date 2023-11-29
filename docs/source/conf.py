@@ -29,7 +29,7 @@ with open(os.path.abspath("../../setup.py"), "r") as setup_file:
 extensions = [
     "sphinx.ext.duration",
     "sphinx.ext.doctest",
-    "sphinx.ext.autodoc",
+    "sphinx.ext.autodoc"
 ]
 
 templates_path = ["_templates"]
@@ -40,3 +40,7 @@ exclude_patterns = []
 
 html_theme = "alabaster"
 html_static_path = ["_static"]
+
+html_additional_pages = {
+    "custom_singlehtml" : "layout.html",
+}
