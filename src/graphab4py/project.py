@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-'''
-graphab4py - A Python interface to Graphab
-
-Graphab4py provides a Python interface to Graphab, allowing users to perform
-network analysis and related tasks.
-
-Features:
-- Integration with Graphab algorithms
-- Network analysis tools
-- Visualization functions
-
-For more information, visit: https://github.com/ManuelPopp/graphab4py
-'''
 __author__ = "Manuel"
 __date__ = "Mon Sep 25 13:51:41 2023"
 __credits__ = ["Manuel R. Popp"]
