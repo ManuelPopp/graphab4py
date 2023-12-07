@@ -58,7 +58,7 @@ def _get_settings(file = os.path.join(_cfg_dir, _cfg_file), silent = False):
     -------
     ga_settings : dict
         Graphab4py settings.
-    
+
     '''
     if os.path.isfile(file):
         with open(file, "rb") as f:
@@ -98,14 +98,14 @@ def _delete_settings(file = os.path.join(_cfg_dir, _cfg_file)):
     Returns
     -------
     None.
-    
+
     '''
     os.remove(file)
 
 def try_java(java):
     '''
     Try to receive and print the Java version from the given path or shortcut.
-    
+
     Parameters
     ----------
     java : str
@@ -120,7 +120,7 @@ def try_java(java):
     Returns
     -------
     None.
-    
+
     '''
     try:
         out = subprocess.run(
@@ -135,14 +135,170 @@ def try_java(java):
     except:
         raise FileNotFoundError(java)
 
-def set_java(path):
+def set_memory(memory, unit = None, temporary = True):
+    '''
+    Set a limit for the RAM Graphab allocates.
+
+    Parameters
+    ----------
+    memory : int or str
+        Maximum memory to allocate. Can be an integer (in this case the unit
+        argument must be set) or a string containing number and unit. This
+        value will be passed to Java using argument -xmx.
+
+    unit : str, optional
+        Unit. Either 'm' for Mb or 'g' for Gb.
+
+    temporary : bool, optional
+        Whether to set the memory restriction only for this session.
+        The default is True.
+
+    Raises
+    ------
+    ValueError
+        Value error if forbidden data types are passed to the arguments.
+
+    UserWarning
+        If psutil is available, setting a memory limit above the currently
+        available memory will raise a warning.
+
+    Returns
+    -------
+    None.
+
+    '''
+    global ga_settings
+    
+    if isinstance(memory, str):
+        mem = memory.lower().strip("b")
+        unit = mem.lstrip("0123456789")
+        
+        try:
+            mem = int(mem.strip(unit))
+        
+        except ValueError:
+            raise ValueError(
+                f"Invalid input '{memory}'. Cannot be converted to int + str."
+                )
+        
+        if unit not in ["m", "g"]:
+            raise ValueError(
+                f"Invalid input '{memory}'. Unit must be 'm' or 'g'."
+                )
+        else:
+            memory = f"{mem}{unit}"
+    
+    elif isinstance(memory, int):
+        mem = memory
+        
+        if isinstance(unit, str):
+            unit = unit.lower()
+            
+            if unit in ["m", "g"]:
+                memory = f"{mem}{unit}"
+            
+            else:
+                raise ValueError(
+                    f"Invalid input '{memory}'. Unit must be 'm' or 'g'."
+                    )
+        
+        else:
+            raise ValueError(
+                "Argument 'unit' must be a string wnen 'memory' is int."
+                )
+    
+    else:
+        raise ValueError(
+            f"Invalid data type {type(memory)} to argument 'memory'." +
+            " Must be int or str."
+            )
+    
+    if not isinstance(temporary, bool):
+        raise ValueError(
+            f"Argument 'temporary' must be bool but is {type(temporary)}."
+            )
+    
+    mega = mem if unit == "m" else mem * 10**3
+    
+    global ga_settings
+    ga_settings["memory"] = memory
+    
+    if not temporary:
+        _ga_settings = _get_settings(silent = True)
+        _ga_settings["memory"] = memory
+        
+        _write_settings(_ga_settings)
+    
+    try:
+        import psutil
+        vmem = psutil.virtual_memory()._asdict()
+        avail = vmem["available"] * 10**(-6)
+        
+        mssg = "Graphab maximum allocated memory was set to {0} Mb but " + \
+            "only {1} Mb of available RAM were detected by psutil."
+        
+        if mega > avail:
+            warnings.warn(mssg.format(mega, avail))
+        
+        else:
+            print(f"Memory was set to {mega} Mb.")
+    
+    except:
+        pass
+    
+    return
+
+def set_cores(n, temporary = True):
+    '''
+    Set maximum number of cores for Graphab to use.
+
+    Parameters
+    ----------
+    n : int
+        Maximum number of CPU cores to use.
+    
+    temporary : bool, optional
+        Whether to set the GPU restriction only for this session.
+        The default is True.
+    
+    Returns
+    -------
+    None.
+
+    '''
+    if not isinstance(temporary, bool):
+        raise ValueError(
+            f"Argument 'temporary' must be bool but is {type(temporary)}."
+            )
+    
+    if isinstance(n, int):
+        global ga_settings
+        ga_settings["memory"] = n
+        
+        if not temporary:
+            _ga_settings = _get_settings(silent = True)
+            _ga_settings["memory"] = n
+            
+            _write_settings(_ga_settings)
+    
+    else:
+        raise ValueError(
+            f"Invalid data type {type(n)} for argument 'n'. Must be 'bool'."
+            )
+    
+    return
+
+def set_java(path, temporary = False):
     '''
     Set Java executable. This approach will set the Jaca path across sessions.
-    
+
     Parameters
     ----------
     path : str
         Path or shortcut to Java executable.
+    
+    temporary : bool, optional
+        Whether to set Java only for this session. The default is False.
     
     Raises
     ------
@@ -154,18 +310,24 @@ def set_java(path):
     Returns
     -------
     None.
-    
+
     '''
+    if not isinstance(temporary, bool):
+        raise ValueError(
+            f"Argument 'temporary' must be bool but is {type(temporary)}."
+            )
+    
     try:
         try_java(path)
         
         global ga_settings
         ga_settings["java"] = path
         
-        _ga_settings = _get_settings(silent = True)
-        _ga_settings["java"] = path
-        
-        _write_settings(_ga_settings)
+        if not temporary:
+            _ga_settings = _get_settings(silent = True)
+            _ga_settings["java"] = path
+            
+            _write_settings(_ga_settings)
     
     except FileNotFoundError:
         raise Exception(f"Unable to locate Java at {path}.")
@@ -174,7 +336,7 @@ def set_graphab(path):
     '''
     Set directory to Graphab. This approach will set the Graphab path across
     sessions.
-    
+
     Parameters
     ----------
     path : str
@@ -189,7 +351,7 @@ def set_graphab(path):
     Returns
     -------
     None.
-    
+
     '''
     if not isinstance(path, str):
         
@@ -235,7 +397,7 @@ def set_graphab(path):
 def get_graphab(directory):
     '''
     Download the Graphab .jar file.
-    
+
     Parameters
     ----------
     path : str
@@ -245,7 +407,7 @@ def get_graphab(directory):
     -------
     exit_status : tuple
         (Directory, HTTPMessage)
-    
+
     '''
     if not (os.path.isdir(directory) or directory.endswith(".jar")):
         raise FileNotFoundError(
@@ -259,11 +421,11 @@ def get_graphab(directory):
     print("Downloading Graphab...")
     url = "https://thema.univ-fcomte.fr/productions/" + \
         "download.php?name=graphab&version=2.8&username=Graph4lg&institution=R"
-    exit_status = urlretrieve(url, filename)
+    out_file, exit_status = urlretrieve(url, filename)
     
-    set_graphab(filename)
+    set_graphab(out_file)
     
-    return exit_status
+    return out_file, exit_status.as_string()
 
 #-----------------------------------------------------------------------------|
 # Settings
@@ -493,6 +655,7 @@ class DistanceConverter():
         plt.plot(self.x, self.y, "o")
         plt.plot(self.x, self.params[0] * self.x + self.params[1])
         plt.show()
+        plt.clf()
     
     def save_plot(self, file):
         '''
@@ -520,6 +683,7 @@ class DistanceConverter():
         plt.plot(self.x, self.y, "o")
         plt.plot(self.x, self.params[0] * self.x + self.params[1])
         plt.savefig(file)
+        plt.clf()
 
 class Project():
     def __init__(self):
