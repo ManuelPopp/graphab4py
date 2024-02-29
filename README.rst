@@ -130,6 +130,19 @@ Note that changing the distance interval will overwrite any previously fit model
 In the last line, we calculate the metric "equivalent connectivity" (EC) for the entire graph. This metric requires additional parameters :python:`d` and :python:`p`.
 Other metrics might not require additional parameters. A list of all the available metrics and their parameters and properties can be viewed in the original `Graphab manual <https://sourcesup.renater.fr/www/graphab/en/documentation.html>`_.
 
+Retrieving graph properties
++++++++++++++++++++++++++++
+Graphab4py can now also extract patches, nodes, and edges from a Graphab project. Moreover, it can create a distance matrix for distances between the nodes of a graph.
+
+.. code-block:: python
+   
+   prj.get_graph_representation()
+   
+   dist_matrix = prj.get_distances()
+   
+   
+Here, we load graph objects into our project instance. Subsequently, we return the distance matrix as a python:`pandas.DataFrame` and store it in the variable :python:`dist_matrix`. Graph objects are stored as attributes of the project instance. They can be accessed using :python:`.links`, :python:`nodes`, and :python:`patches`. All of them are :python:`GeoPandas` objects and can be used to create graphical representations, maps, and more.
+
 =======
 License
 =======
