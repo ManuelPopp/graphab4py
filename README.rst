@@ -141,7 +141,7 @@ Graphab4py can now also extract patches, nodes, and edges from a Graphab project
    dist_matrix = prj.get_distances()
    
    
-Here, we load graph objects into our project instance. Subsequently, we return the distance matrix as a python:`pandas.DataFrame` and store it in the variable :python:`dist_matrix`. Graph objects are stored as attributes of the project instance. They can be accessed using :python:`.links`, :python:`nodes`, and :python:`patches`. All of them are :python:`GeoPandas` objects and can be used to create graphical representations, maps, and more.
+Here, we load graph objects into our project instance. Subsequently, we return the distance matrix as a python:`pandas.DataFrame` and store it in the variable :python:`dist_matrix`. Graph objects are stored as attributes of the project instance. They can be accessed using :python:`.links`, :python:`.nodes`, and :python:`.patches`. All of them are :python:`GeoPandas` objects and can be used to create graphical representations, maps, and more.
 
 =======
 License
