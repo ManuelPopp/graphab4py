@@ -4,7 +4,7 @@ __author__ = "Manuel"
 __date__ = "Mon Sep 25 13:51:41 2023"
 __credits__ = ["Manuel R. Popp"]
 __license__ = "Unlicense"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __maintainer__ = "Manuel R. Popp"
 __email__ = "requests@cdpopp.de"
 __status__ = "Development"
@@ -1287,6 +1287,110 @@ class Project():
             print("Graph created.")
         
         return
+    
+    def get_graph_representation(self, linkset = None):
+        '''
+        Import graph information into Python.
+
+        Parameters
+        ----------
+        linkset : str, optional
+            Linkset to use. The default is None.
+
+        Returns
+        -------
+        None.
+
+        '''
+        if self.linksets is None:
+            mssg = "No linksets were created yet. Use create_linkset to " + \
+                "create a linkset first."
+            
+            raise Exception(mssg)
+        
+        elif linkset is None:
+            linkset = self.linksets[0]
+            print("Using first linkset: {}".format(linkset))
+        
+        elif linkset not in self.linksets:
+            mssg = f"Linkset '{linkset}' not found. Use create_linkset to " + \
+                "create a new linkset or call attribute .linksets to list " + \
+                    "existing linksets."
+            
+            raise ValueError(mssg)
+        
+        self._linksetname = linkset
+        
+        import geopandas as gpd
+        
+        if os.path.isfile(
+                os.path.join(self.directory, self.name, linkset + ".shp")
+                ):
+            f_links = os.path.join(self.directory, self.name, linkset + ".shp")
+        
+        elif os.path.isfile(
+                os.path.join(self.directory, self.name, linkset + "-links.shp")
+                ):
+            f_links = os.path.join(
+                self.directory, self.name, linkset + "-links.shp"
+                )
+        
+        else:
+            raise Exception("Linkset {} not found.".format(f_links))
+        
+        self.links = gpd.read_file(f_links)
+        
+        f_patches = os.path.join(self.directory, self.name, "patches.shp")
+        self.patches = gpd.read_file(f_patches)
+        
+        self.nodes = gpd.GeoDataFrame(
+            data = self.patches.drop(columns = "geometry"),
+            geometry = self.patches.geometry.centroid,
+            crs = self.patches.crs
+            )
+        
+        return
+    
+    def get_distances(self, dist_type = "cost", linkset = None):
+        '''
+        Extract distance matrix from graph.
+
+        Parameters
+        ----------
+        dist_type : str, optional
+            Define the distance type. Either "euclid" or "cost".
+            The default is None.
+        linkset : pandas.DataFrame, optional
+            Table of edges of the graph. The default is None.
+
+        Returns
+        -------
+        dist_mat : pandas.core.frame.DataFrame
+            Distance matrix for the connections between nodes of the graph.
+
+        '''
+        if hasattr(self, "_linksetname"):
+            if not self._linksetname == linkset:
+                self.get_graph_representation(linkset = linkset)
+        
+        else:
+            self.get_graph_representation(linkset = linkset)
+        
+        if dist_type not in ["euclid", "cost"]:
+            warnings.warn(
+                "Distance type {} not supported. Defaulting to 'cost'."
+                .format(dist_type)
+                )
+        
+        distance_type = "Dist" if dist_type == "euclid" else "DistM"
+        
+        dist_mat = self.links.drop(columns = "geometry").pivot(
+            index = "ID1", columns = "ID2", values = distance_type
+            )
+        
+        self.distances = dist_mat
+        
+        return dist_mat
     
     def calculate_metric(self, metric, linkset = None, graph = None,
                          mtype = "global", **metric_args):

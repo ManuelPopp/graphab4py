@@ -28,6 +28,13 @@ __status__ = "Production"
 import os, unittest
 from src.graphab4py import get_graphab
 
+dir_py = os.path.dirnam(__file__)
+dir_main = os.path.dirname(dir_py)
+dir_dat = os.path.join(dir_py, "test_data")
+
+habitat_patches = os.path.join(dir_dat, "habitat_patches.tif")
+resistance_surface = os.path.join(dir_dat, "resistance.tif")
+
 class TestGraphab4py(unittest.TestCase):
     def test_get_graphab(self):
         out_file, out_status = get_graphab()
